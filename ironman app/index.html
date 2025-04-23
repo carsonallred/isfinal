@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ironman 70.3 Pace-Based Time Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #f0f4f8;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input {
+      padding: 0.4rem;
+      margin: 0.2rem;
+      width: 60px;
+    }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.5rem 1rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 2rem;
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Ironman 70.3 Pace-Based Time Calculator</h1>
+  <p>Enter your average paces and transition times to estimate your total race time and chances of qualifying.</p>
+
+  <label>Swim Pace (per 100m):
+    <input type="number" id="swimMin" placeholder="min" /> min
+    <input type="number" id="swimSec" placeholder="sec" /> sec
+  </label>
+
+  <label>Bike Speed:
+    <input type="number" id="bikeMph" placeholder="mph" step="0.1" /> mph
+  </label>
+
+  <label>Run Pace (per mile):
+    <input type="number" id="runMin" placeholder="min" /> min
+    <input type="number" id="runSec" placeholder="sec" /> sec
+  </label>
+
+  <label>Transition Times:
+    <input type="number" id="t1" placeholder="T1 (min)" /> T1
+    <input type="number" id="t2" placeholder="T2 (min)" /> T2
+  </label>
+
+  <button onclick="calculateTime()">Calculate Total Time</button>
+
+  <div class="result" id="resultArea"></div>
+
+  <script>
+    function padZero(num) {
+      return num.toString().padStart(2, '0');
+    }
+
+    function calculateTime() {
+      // Swim pace
+      const swimMin = parseInt(document.getElementById("swimMin").value) || 0;
+      const swimSec = parseInt(document.getElementById("swimSec").value) || 0;
+      const swimPacePer100 = swimMin + swimSec / 60;
+      const swimDistanceMeters = 1900;
+      const swimTime = (swimDistanceMeters / 100) * swimPacePer100;
+
+      // Bike speed
+      const bikeSpeed = parseFloat(document.getElementById("bikeMph").value) || 0;
+      const bikeDistance = 56;
+      const bikeTime = bikeSpeed > 0 ? (bikeDistance / bikeSpeed) * 60 : 0;
+
+      // Run pace
+      const runMin = parseInt(document.getElementById("runMin").value) || 0;
+      const runSec = parseInt(document.getElementById("runSec").value) || 0;
+      const runPacePerMile = runMin + runSec / 60;
+      const runDistance = 13.1;
+      const runTime = runDistance * runPacePerMile;
+
+      // Transitions
+      const t1 = parseInt(document.getElementById("t1").value) || 0;
+      const t2 = parseInt(document.getElementById("t2").value) || 0;
+
+      const totalTime = swimTime + bikeTime + runTime + t1 + t2;
+      const hours = Math.floor(totalTime / 60);
+      const minutes = Math.round(totalTime % 60);
+
+      // World Champs Qualifying Estimate
+      const qualifyingTime = 290; // 4 hr 50 min = 290 min
+      const qualificationLikely = totalTime <= qualifyingTime;
+
+      const resultText = `
+        <h2>Results</h2>
+        <p><strong>Total Time:</strong> ${hours} hr ${padZero(minutes)} min</p>
+        <p><strong>World Championship Qualifying Estimate:</strong><br>
+        Average qualifying time for M18–24: 4 hr 50 min<br>
+        Your time is ${qualificationLikely ? "<span style='color:green;'>within range 🎉</span>" : "<span style='color:red;'>outside the range 😕</span>"}
+        </p>
+      `;
+
+      document.getElementById("resultArea").innerHTML = resultText;
+    }
+  </script>
+</body>
+</html>
